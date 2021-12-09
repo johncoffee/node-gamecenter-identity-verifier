@@ -6,7 +6,6 @@
   "scripts": {
     "lint": "jshint lib test",
     "test": "mocha --reporter spec test",
-    "prepare": "npm run lint && npm test",
     "coverage": "istanbul cover _mocha --report text -- -R spec test",
     "coveralls": "istanbul cover _mocha --report lcovonly -- --reporter spec && cat coverage/lcov.info | coveralls"
   },
