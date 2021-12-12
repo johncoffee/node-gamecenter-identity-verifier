@@ -4,9 +4,8 @@
   "description": "A small library to verify the identity of apple-gamecenter's local player for consuming it in node.js backend server.",
   "main": "./lib/main.js",
   "scripts": {
-    "lint": "jshint lib test",
     "test": "mocha --reporter spec test",
-    "prepare": "npm run lint && npm test",
+    "prepare": "npm test",
     "coverage": "istanbul cover _mocha --report text -- -R spec test",
     "coveralls": "istanbul cover _mocha --report lcovonly -- --reporter spec && cat coverage/lcov.info | coveralls"
   },
