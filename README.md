@@ -1,3 +1,5 @@
+![CircleCI](https://circleci.com/gh/johncoffee/node-gamecenter-identity-verifier.svg?style=svg)
+
 # node-gamecenter-identity-verifier
 
 This is library to validate a apple's gamecenter identity of localplayer for consuming it in [node.js][node] backend server.
