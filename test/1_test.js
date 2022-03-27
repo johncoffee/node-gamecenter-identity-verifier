@@ -61,7 +61,8 @@ describe('verifying gameCenter identity', function () {
     };
     testToken.signature = calculateSignature(testToken);
 
-    await verifier.verify(testToken, false);
+    const isValid = await verifier.verify(testToken, false);
+    assert.strictEqual(isValid, true)
   });
 
   /*jshint multistr: true */
@@ -77,7 +78,8 @@ timestamp high and low bit block is 1',
     };
     testToken.signature = calculateSignature(testToken);
 
-    await verifier.verify(testToken, false);
+    const isValid = await verifier.verify(testToken, false);
+    assert.strictEqual(isValid, true)
   });
 
   it('should fail to get publicKey with http: protocol', async function () {
@@ -140,7 +142,6 @@ timestamp high and low bit block is 1',
     const isValid = await verifier.verify(testToken, false)
       .catch(error => assert.fail('should not throw '+error))
 
-    console.log(isValid)
     assert.strictEqual(isValid, false)
 
   });
