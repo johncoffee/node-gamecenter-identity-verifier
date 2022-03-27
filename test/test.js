@@ -51,7 +51,7 @@ describe('verifying gameCenter identity', function () {
   // });
 
   it('should succeed to verify apple game center identity',
-  function (done) {
+  async function () {
     var testToken = {
       publicKeyUrl: 'https://valid.apple.com/public/public.cer',
       timestamp: 1460981421303,
@@ -61,17 +61,13 @@ describe('verifying gameCenter identity', function () {
     };
     testToken.signature = calculateSignature(testToken);
 
-    verifier.verify(testToken, function (error, token) {
-      assert.equal(error, null);
-      assert.equal(token.playerId, testToken.playerId);
-      done();
-    });
+    await verifier.verify(testToken, false);
   });
 
   /*jshint multistr: true */
   it('should succeed to verify identity when most significant (left-most) bit of \
 timestamp high and low bit block is 1',
-  function (done) {
+    async function () {
     var testToken = {
       publicKeyUrl: 'https://valid.apple.com/public/public.cer',
       timestamp: 1462525134342,
@@ -81,15 +77,10 @@ timestamp high and low bit block is 1',
     };
     testToken.signature = calculateSignature(testToken);
 
-    verifier.verify(testToken, function (error, token) {
-      assert.equal(error, null);
-      assert.equal(token.playerId, testToken.playerId);
-      done();
-    });
+    await verifier.verify(testToken, false);
   });
 
-  it('should fail to get publicKey with http: protocol',
-  function (done) {
+  it('should fail to get publicKey with http: protocol', async function () {
     var testToken = {
       publicKeyUrl: 'http://valid.apple.com/public/public.cer',
       timestamp: 1460981421303,
@@ -99,16 +90,20 @@ timestamp high and low bit block is 1',
     };
     testToken.signature = calculateSignature(testToken);
 
-    verifier.verify(testToken, function (error, token) {
+    try {
+      await verifier.verify(testToken, false)
+    }
+    catch (error) {
       assert(error instanceof verifier.SignatureValidationError);
-      assert.equal(error.message, 'Invalid publicKeyUrl: should use https');
-      assert.equal(token, null);
-      done();
-    });
+      assert.strictEqual(error.message, 'Invalid publicKeyUrl: should use https');
+      return
+    }
+
+    assert.fail('should have thrown')
   });
 
   it('should fail to get publicKey if domain is not apple.com',
-  function (done) {
+  async function () {
     var testToken = {
       publicKeyUrl: 'https://invalid.badapple.com/public/public.cer',
       timestamp: 1460981421303,
@@ -118,31 +113,35 @@ timestamp high and low bit block is 1',
     };
     testToken.signature = calculateSignature(testToken);
 
-    verifier.verify(testToken, function (error, token) {
+    try {
+      await verifier.verify(testToken, false)
+    }
+    catch(error) {
       assert(error instanceof verifier.SignatureValidationError);
-      assert.equal(error.message, 'Invalid publicKeyUrl: host should be apple.com');
-      assert.equal(token, null);
-      done();
-    });
+      assert.strictEqual(error.message, 'Invalid publicKeyUrl: host should be apple.com');
+      return
+    };
+
+    assert.fail('should have thrown')
   });
 
   it('should fail to verify signature if signature is invalid',
-  function (done) {
+  async function () {
     var testToken = {
       publicKeyUrl: 'https://valid.apple.com/public/public.cer',
-      timestamp: 1460981421303,
-      salt: 'saltST==',
-      playerId: 'G:1111111',
+      timestamp: 123,
+      salt: Buffer.from([3,2,1]).toString('base64'),
+      playerId: 'G:111111',
       bundleId: 'com.valid.app'
     };
     testToken.signature = calculateSignature(testToken);
-    testToken.salt = 'NOsalt==';
+    testToken.salt = Buffer.from([1,2,3]).toString('base64')
 
-    verifier.verify(testToken, function (error, token) {
-      assert(error instanceof verifier.SignatureValidationError);
-      assert.equal(error.message, 'Invalid Signature');
-      assert.equal(token, null);
-      done();
-    });
+    const isValid = await verifier.verify(testToken, false)
+      .catch(error => assert.fail('should not throw '+error))
+
+    console.log(isValid)
+    assert.strictEqual(isValid, false)
+
   });
 });

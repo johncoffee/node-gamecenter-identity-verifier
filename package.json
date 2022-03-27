@@ -1,11 +1,10 @@
 {
-  "name": "gamecenter-identity-verifier-fork",
-  "version": "0.1.1",
+  "name": "@julian2/gamecenter-identity-verifier",
+  "version": "0.1.2",
   "description": "A small library to verify the identity of apple-gamecenter's local player for consuming it in node.js backend server.",
   "main": "./lib/main.js",
   "scripts": {
     "test": "mocha --reporter spec test",
-    "prepare": "npm test",
     "coverage": "istanbul cover _mocha --report text -- -R spec test",
     "coveralls": "istanbul cover _mocha --report lcovonly -- --reporter spec && cat coverage/lcov.info | coveralls"
   },
@@ -17,7 +16,7 @@
     "apple",
     "gamecenter"
   ],
-  "author": "Catstail <maeltm18@gmail.com>",
+  "author": "johncoffee",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/maeltm/node-gamecenter-identity-verifier/issues"
