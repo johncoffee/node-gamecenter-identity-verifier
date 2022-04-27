@@ -1,6 +1,6 @@
 {
   "name": "@julian2/gamecenter-identity-verifier",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "A small library to verify the identity of apple-gamecenter's local player for consuming it in node.js backend server.",
   "main": "./lib/main.js",
   "scripts": {
