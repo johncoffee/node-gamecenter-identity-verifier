@@ -1,40 +1,36 @@
-/*
-global toString
- */
-'use strict'
+const { strictEqual } = require('assert')
+const verifier = require('../lib/main')
 
-var assert = require('assert')
-var verifier = require('../lib/main')
-
-function isError (error) {
-  return toString.call(error) === '[object Error]'
+// a real token is used to check caching behavior.
+// It will expire at some point.
+const player = {
+  'gamePlayerID': 'A:_650ed1e2127d4e11098d1521e3b7d076',
+  'teamPlayerID': 'T:_2d60bf58179cc5774b0473446c5ae683'
 }
-
-// a real token is used to check caching behavior
-// but sharing it should have no security consequences
-var testToken = {
-  playerId: 'G:1965586982',
-  publicKeyUrl: 'https://static.gc.apple.com/public-key/gc-prod-4.cer',
-  timestamp: 1565257031287,
-  signature: 'uqLBTr9Uex8zCpc1UQ1MIDMitb+HUat2Mah4Kw6AVLSGe0gGNJXlih2i5X+0Z' +
-    'wVY0S9zY2NHWi2gFjmhjt\/4kxWGMkupqXX5H\/qhE2m7hzox6lZJpH98ZEUbouWRfZX2ZhU' +
-    'lCkAX09oRNi7fI7mWL1\/o88MaI\/y6k6tLr14JTzmlxgdyhw+QRLxRPA6NuvUlRSJpyJ4aG' +
-    'tNH5\/wHdKQWL8nUnFYiYmaY8R7IjzNxPfy8UJTUWmeZvMSgND4u8EjADPsz7ZtZyWAPi8kY' +
-    'cAb6M8k0jwLD3vrYCB8XXyO2RQb/FY2TM4zJuI7PzLlvvgOJXbbfVtHx7Evnm5NYoyzgzw==',
-  salt: 'DzqqrQ==',
-  bundleId: 'cloud.xtralife.gamecenterauth'
+const testToken = {
+  publicKeyUrl: "https://static.gc.apple.com/public-key/gc-prod-5.cer",
+  timestamp: 1615458137079,
+  signature: "HpC8l7Uj+UaTxAZvxYsrQjYXU1lxNFzteX5iVqrnVJTVWlWvf9nH66NvKDyw8zjVdtNUQFOzJjYHnWsWQbanqHKRhbP/uVh/uNKJBpAe56/3QKSjtMkpdY32TNgWmXE219ve/isOk9MSRozowO1kEJ60X8TcVglKmoTyXFA4Vo02i7RvpLJWNLvu/Sk+BIlpt54OX1qE+hgjVYiAFKMPGdfaHlIwNwtR5JgrlpwBPOdYL8lG526v6Fw6yraGqUyeQGUbdQ6Yi3V+YN0t6BOVArtyNKGaKIKmaCfS1C3NA7ntGfM0u/KnbDEACDs8dA4skCXivHZySIEFsaZprW8ymw==",
+  salt: "9Rmrxw==",
+  bundleId: "net.triband.tricloud-test1",
+  playerId: player.teamPlayerID,
 }
 
 describe('caching test', function () {
   it('should be slow for first check', async function () {
-    await verifier.verify(testToken)
+    this.timeout(5_000)
+    const verified = await verifier.verify(testToken, false)
+    strictEqual(verified, true, "expected verification to succeed")
   })
 
   it('should take less time for next checks due to caching', async function () {
-    this.timeout(200)
+    const times = 1000
+    const targetAvgMs = 30
+    this.timeout(times * targetAvgMs)
 
-    for (let i = 0; i < 10; i++) {
-      await verifier.verify(testToken)
+    for (let i = 0; i < times; i++) {
+      const verified = await verifier.verify(testToken, true)
+      strictEqual(verified, true, "expected verification to succeed")
     }
   })
 })
